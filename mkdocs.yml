@@ -74,3 +74,4 @@ nav:
       - 00 · Set Up Your Workshop: bonsai-llm/stage-00-setup.md
       - 01 · Build Your Own Mini Math Engine: bonsai-llm/stage-01-mini-math-engine.md
       - 02a · Get Real Data and Look at It: bonsai-llm/stage-02a-data.md
+      - 02b · Teach a Line to Fit Itself: bonsai-llm/stage-02b-gradient-descent.md
