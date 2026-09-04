@@ -72,6 +72,17 @@ for name, thing in [("scalar", scalar), ("vector", vector), ("matrix", matrix)]:
     print(f"{name:7} {np.shape(thing)}")
 ```
 
+??? info "🐍 Python syntax — `for x, y in [...]`, f-strings"
+    `[("scalar", scalar), ("vector", vector), ("matrix", matrix)]` is a list
+    of three pairs. `for name, thing in ...` unpacks each pair into two names
+    at once, one iteration per pair — the same idea as `train, val = ...`
+    later in this journey, just supplying many pairs instead of one.
+
+    `f"{name:7} ..."` is an f-string: the `f` before the quote means anything
+    in `{}` gets evaluated and spliced into the string. The `:7` after `name`
+    is a formatting spec — "pad this to 7 characters" — used here so the
+    three printed shapes line up in a column.
+
 Run it. The scalar has shape `()`, the vector `(2,)`, the matrix `(2, 3)`.
 
 That empty pair of brackets is worth a moment. A scalar is not a
@@ -126,6 +137,17 @@ def test_dot_rejects_mismatched_lengths():
         dot(np.array([1.0, 2.0]), np.array([1.0, 2.0, 3.0]))
 ```
 
+??? info "🐍 Python syntax — `from ... import`, `range`, `with ... :`"
+    `from math_engine import dot` grabs just the one name `dot` out of your
+    `math_engine` module, instead of importing the whole module under a
+    prefix. `for _ in range(20)` runs the loop body 20 times; `range(20)`
+    counts `0` up to but not including `20`, and `_` is the conventional
+    name for a loop variable the body never actually uses.
+
+    `with pytest.raises(ValueError):` opens a block that expects the code
+    inside it to raise a `ValueError` — the test passes only if that error
+    actually happens, and fails if the code runs without error instead.
+
 ```powershell
 cd 01_math_engine
 pytest
@@ -148,6 +170,13 @@ def matmul(A, B):
     """Matrix product of A (m x n) and B (n x p). Returns (m x p)."""
     raise NotImplementedError
 ```
+
+??? info "🐍 Python syntax — `A[i, k]`, `B[:, j]`"
+    `u[i]` from Build 2 indexes a 1-D array with one number. A 2-D array
+    needs two, separated by a comma: `A[i, k]` is the entry in row `i`,
+    column `k`. A bare `:` in either slot means "every position there" —
+    `B[:, j]` is every row, column `j`, i.e. the whole of column `j`. You'll
+    write both forms below.
 
 $$
 C_{ij} = \sum_{k=1}^{n} A_{ik} B_{kj}
@@ -182,7 +211,9 @@ def test_matmul_rejects_bad_shapes():
         matmul(np.zeros((2, 3)), np.zeros((4, 5)))
 ```
 
-Then measure what it cost you:
+Run it: `pytest`. Four tests, four passes.
+
+Then measure what it cost you. Add to `math_engine.py`:
 
 ```python
 import time
@@ -197,6 +228,14 @@ print(f"mine   {mine:.3f}s")
 print(f"numpy  {theirs:.4f}s")
 print(f"ratio  {mine / theirs:.0f}x")
 ```
+
+??? info "🐍 Python syntax — `;` on one line"
+    `t0 = time.perf_counter(); matmul(A, B); mine = time.perf_counter() - t0`
+    is three statements written on one line, separated by `;` instead of
+    three lines. It works anywhere, but is rarely used — here only to keep
+    the "start the clock, do the work, read the clock" sequence visually
+    together. `{mine:.3f}` is the same formatting spec as `{name:7}` earlier,
+    this time meaning "3 digits after the decimal point."
 
 Write that ratio in your log. Your loops are correct — and expect the ratio
 to be large. Two, three, even four orders of magnitude slower is normal for
@@ -214,6 +253,7 @@ first half.
 ## 🔨 Build 4 — Watch a matrix move something
 
 A matrix is not a grid of numbers. It is a thing that *does* something to space.
+Add to `math_engine.py`:
 
 ```python
 import matplotlib.pyplot as plt
@@ -241,6 +281,14 @@ one, then run it.
 For the flat one, compute `np.linalg.det(M)` and note what the determinant is.
 You know what a zero determinant means algebraically. Now you can see it:
 the transformation threw away a dimension, and no matrix can put it back.
+
+Commit your work:
+
+```powershell
+cd C:\dev\bonsai
+git add .
+git commit -m "Stage 01: dot, matmul and a transformation, checked against NumPy"
+```
 
 ---
 

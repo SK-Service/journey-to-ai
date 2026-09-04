@@ -76,6 +76,12 @@ mkdir C:\dev\bonsai
 cd C:\dev\bonsai
 ```
 
+??? info "💻 Command line — `mkdir`, `cd`"
+    `mkdir C:\dev\bonsai` creates a folder at that path. `cd C:\dev\bonsai`
+    moves your terminal's "current folder" into it, so every command you run
+    after this — installing libraries, creating files, `git` commands —
+    happens there instead of wherever the terminal happened to open.
+
 Now create a **virtual environment** — a private copy of Python that belongs to
 this project alone. Install a library into it and nothing else on your machine
 changes.
@@ -84,6 +90,18 @@ changes.
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
+
+??? info "💻 Command line — `python -m venv`, `Activate.ps1`"
+    `-m venv` tells Python to run its built-in `venv` module, which creates
+    the `.venv` folder — a private copy of the Python interpreter, empty of
+    libraries until you `pip install` into it. Nothing is copied out of your
+    main Python install.
+
+    `Activate.ps1` doesn't install anything. It's a script that edits *this
+    terminal window's* `PATH` so `python` and `pip` point at `.venv`'s copies
+    instead of your system-wide one — which is what makes `(.venv)` appear in
+    your prompt. Close the terminal and that edit is gone; run the activate
+    line again next time you open a new one.
 
 Your prompt should now start with `(.venv)`.
 
@@ -141,6 +159,30 @@ plt.title("my first vector")
 plt.show()
 ```
 
+??? info "🐍 Python syntax — `import numpy as np`, `v[0]`"
+    `import` pulls a library's code into your file so you can use it.
+    `import numpy as np` also gives it a short local name — `as np` — so the
+    rest of the file writes `np.array(...)` instead of spelling out
+    `numpy.array(...)` every time. The name after `as` is your choice, but
+    `np` and `plt` are conventions strong enough that changing them would
+    confuse anyone else reading the code.
+
+    `v[0]` and `v[1]` pull out the first and second entries of `v`. Square
+    brackets index into a sequence by position, and Python counts from `0` —
+    so `v[0]` is the first entry, not the one "before" it. You'll write this
+    constantly from here on.
+
+??? info "🔧 What this code does — plotting the arrow"
+    `plt.figure(figsize=(4, 4))` opens a blank 4x4-inch canvas. `plt.quiver(0,
+    0, v[0], v[1], angles="xy", scale_units="xy", scale=1)` draws one arrow
+    from the origin `(0, 0)` to the point `(v[0], v[1])` — `quiver` is
+    matplotlib's name for "draw arrows," and those three keyword arguments
+    tell it to draw a plain xy arrow rather than the scaled vector-field
+    arrows it draws by default. `plt.xlim(-1, 5)`/`plt.ylim(-1, 5)` fix the
+    visible axis range so the arrow doesn't float off-center; `plt.grid(True)`
+    and `plt.title(...)` add gridlines and a title. Nothing appears on screen
+    until `plt.show()` — every call before it only describes the picture.
+
 Run it:
 
 ```powershell
@@ -178,6 +220,20 @@ def test_vector_length():
     assert np.isclose(vector_length(np.array([1.0, 1.0])), np.sqrt(2))
 ```
 
+??? info "🐍 Python syntax — `def`, `raise`, and `assert`"
+    `def vector_length(v):` defines a function: a name, its parameters in
+    `()`, a colon, then an indented body. The line right after `def` in
+    quotes — `"""Return the Euclidean length of v."""` — is a docstring,
+    a description of what the function does. `raise NotImplementedError` is
+    a placeholder: it deliberately crashes with a clear message until you
+    replace it with a real body that computes and returns a value.
+
+    The second function, `def test_vector_length():`, is not called
+    anywhere on this page — `pytest` finds every function named `test_...`
+    automatically and runs it. Inside it, `assert condition` does nothing if
+    `condition` is true and stops the test loudly, naming what failed, if it
+    is not.
+
 Run it:
 
 ```powershell
@@ -207,6 +263,11 @@ git --version
 If that fails, install [Git for Windows](https://git-scm.com/download/win),
 accepting the defaults, then reopen PowerShell.
 
+Left alone, git tracks every file in the folder — including `.venv`, which
+is large, machine-specific, and rebuildable, not something worth saving a
+history of. A `.gitignore` file tells git which paths to leave alone, before
+it ever gets the chance to track them.
+
 Create a file called `.gitignore` containing these three lines:
 
 ```text
@@ -223,6 +284,15 @@ git init -b main
 git add .
 git commit -m "Stage 0: workshop set up"
 ```
+
+??? info "💻 Command line — `git init -b`, `git add .`, `git commit -m`"
+    `git init` creates a new, empty repository in the current folder; `-b
+    main` names its first branch `main` (git's older default was `master`).
+    `git add .` stages every file in the current folder — `.` meaning "here"
+    — for the next commit; "staged" means "marked as ready to save," not
+    saved yet. `git commit -m "..."` saves everything staged as one point in
+    history; `-m` supplies the message directly instead of opening an editor
+    for it.
 
 Now make it real. On [github.com](https://github.com), create a new **public**
 repository. Do not add a README — you already have files. Then run the two
