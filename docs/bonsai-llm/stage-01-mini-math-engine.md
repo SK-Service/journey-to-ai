@@ -165,6 +165,8 @@ check it against something you did not write.**
 
 ## 🔨 Build 3 — Matrix multiplication, by hand
 
+Same file, next function. Add to `math_engine.py`:
+
 ```python
 def matmul(A, B):
     """Matrix product of A (m x n) and B (n x p). Returns (m x p)."""

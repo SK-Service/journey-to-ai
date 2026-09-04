@@ -263,9 +263,11 @@ def test_split_is_chronological():
     apart and do unrelated things — this is the one line on the page where
     mixing them up would silently test the wrong thing.
 
-Run it:
+Run it — re-anchor to the repo root first, in case you're picking this back
+up in a fresh terminal or still sitting in `02a_data` from Build 1:
 
 ```powershell
+cd C:\dev\bonsai
 cd 02a_data
 pytest
 ```
@@ -322,7 +324,7 @@ in — not 2008, not 2022, but now.
 
 Then answer one question from the picture: **week to week, how much does this
 line actually move?** Not year to year — week to week. Zoom into any twelve
-months and look:
+months and look. Add to `02a_data/explore.py`:
 
 ```python
 weekly_change = df["price"].diff()
