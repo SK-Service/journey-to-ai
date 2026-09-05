@@ -138,6 +138,13 @@ Install [VS Code](https://code.visualstudio.com/), open it, and use
 **File → Open Folder** on `C:\dev\bonsai`. Install the Microsoft **Python**
 extension when it offers.
 
+You'll do two things in VS Code from here on: write Python files, and run
+them. To create one, look at the **Explorer** panel on the left — hover
+over the folder name and click the "New File" icon (or right-click it) —
+and name the file with a `.py` extension. To run one, use VS Code's
+**built-in terminal**, not a separate PowerShell window; you'll open it the
+same way every time from here on.
+
 Make a file called `hello_vector.py`:
 
 ```python
@@ -187,7 +194,8 @@ That arrow runs 3 across and 4 up from the origin — a right triangle, with
 the arrow itself as the hypotenuse. Before you run this, use the
 Pythagorean theorem to work out what `length:` should print.
 
-Run it:
+Open a terminal — **Terminal → New Terminal** in the top menu bar — and run
+it there:
 
 ```powershell
 python hello_vector.py
