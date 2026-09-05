@@ -183,15 +183,19 @@ plt.show()
     and `plt.title(...)` add gridlines and a title. Nothing appears on screen
     until `plt.show()` — every call before it only describes the picture.
 
+That arrow runs 3 across and 4 up from the origin — a right triangle, with
+the arrow itself as the hypotenuse. Before you run this, use the
+Pythagorean theorem to work out what `length:` should print.
+
 Run it:
 
 ```powershell
 python hello_vector.py
 ```
 
-A window opens with an arrow in it, and the terminal prints a length of `5.0`.
-You already knew it would be 5. That is the point — the machine agrees with you,
-so the machine is working.
+A window opens with an arrow in it, and the terminal prints a length of
+`5.0` — matching what you worked out by hand above. That is the point — the
+machine agrees with you, so the machine is working.
 
 Close the plot window to end the program.
 
@@ -230,9 +234,24 @@ def test_vector_length():
 
     The second function, `def test_vector_length():`, is not called
     anywhere on this page — `pytest` finds every function named `test_...`
-    automatically and runs it. Inside it, `assert condition` does nothing if
-    `condition` is true and stops the test loudly, naming what failed, if it
-    is not.
+    automatically and runs it.
+
+    `assert` is Python's built-in "this had better be true" check.
+    `assert condition` does nothing at all if `condition` is `True`; if
+    it's `False`, Python immediately raises an `AssertionError` and stops
+    right there, naming the exact line that failed. A few examples outside
+    any test:
+    ```python
+    assert 2 + 2 == 4                  # True - nothing happens
+    assert len([1, 2, 3]) == 3         # True - nothing happens
+    assert 1 == 2, "one is not two"    # False - raises: AssertionError: one is not two
+    ```
+    The optional text after a comma is a message shown only if the check
+    fails, so you can say what went wrong in your own words instead of just
+    seeing the failing expression. A test function is a normal function
+    whose body is a string of these checks — `pytest` runs every
+    `test_...` function it finds and reports every `assert` that failed,
+    across every test, in one pass.
 
 Run it:
 
