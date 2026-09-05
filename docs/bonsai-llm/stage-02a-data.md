@@ -45,8 +45,9 @@ algorithm.
    week's price? Write it down. You will need it later, and it is a tougher
    opponent than it looks.
 
-Question 2 has a name — **leakage** — and it is the single most common way a
-result turns out to be worthless.
+Question 2 has a name — **leakage** — letting information your model would
+not actually have at prediction time slip into training anyway. It is the
+single most common way a result turns out to be worthless.
 
 ---
 
@@ -60,9 +61,19 @@ pip freeze > requirements.txt
 mkdir 02a_data\raw
 ```
 
+That `pip freeze` line matters again here, not just the first time in Stage
+00: it rewrites `requirements.txt` with everything currently installed, so
+running it again after adding `pandas` folds the new dependency into the
+same file — you never edit that file by hand.
+
 **pandas** is this stage's one new tool. It handles tables: rows, columns, dates,
 missing values. NumPy holds numbers; pandas holds *labelled* numbers, which is
-what real data always is.
+what real data always is. Without labels, a plain NumPy array of this same
+data is just numbers by position — `data[0, 1]` might be a price or a date,
+and you'd have to remember which column means what by counting. A pandas
+DataFrame replaces position with a name: `df["price"]` and `df["date"]` say
+exactly what they hold, so code that reads this file six months from now
+still makes sense without you memorising a column order.
 
 The US Energy Information Administration publishes weekly retail gasoline prices
 going back to 1990, free and without a login. Find their download page, get the
@@ -97,10 +108,26 @@ def load_prices(filename):
     "the `raw` folder next to this script," wherever this project ends up on
     disk.
 
+`filename` is the CSV you downloaded above, sitting inside `RAW`. The
+docstring is the contract this function has to satisfy: return a
+DataFrame with exactly two columns, `date` and `price`, sorted oldest
+first — whatever the raw file's own column names and row order turn out
+to be.
+
 Write the body. `pd.read_csv` will get you started; you will need to skip some
 header rows, rename the columns, parse the date column with
 `pd.to_datetime`, and sort. Getting this to work *is* the Build — real files
 are never shaped the way you want them.
+
+??? tip "Hint — open only when stuck"
+    `pd.read_csv(RAW / filename, skiprows=4, names=["date", "price"])`
+    skips the file's header rows and names the two columns yourself,
+    rather than trusting whatever the raw file's own header row says.
+    `df["date"] = pd.to_datetime(df["date"])` turns the date column from
+    text into a real date, which every later Build depends on. Return
+    `df.sort_values("date")`, sorted oldest first. (What to do about
+    missing or duplicated rows is Build 2's decision, not this one —
+    leave that for when you've actually seen what's wrong.)
 
 Create `02a_data/explore.py` and call it there:
 
@@ -221,7 +248,8 @@ def time_split(df, train_fraction=0.8):
     Then `cut = int(len(df) * train_fraction)` gives you a row count, and
     `df.iloc[:cut]` / `df.iloc[cut:]` split by position: the first `cut`
     rows, then everything after. `.iloc` is pandas' way of saying "by
-    position," as opposed to selecting by a column's actual values.
+    position," as opposed to selecting by a column's actual values. Return
+    both as a pair: `return df.iloc[:cut], df.iloc[cut:]`.
 
 Write it, then call it in `02a_data/explore.py` (update the import to
 `from load import load_prices, time_split`):
@@ -231,6 +259,16 @@ train, val = time_split(df)
 print(len(train), len(val))
 print(train["date"].max(), val["date"].min())
 ```
+
+??? info "🔧 What this code does — checking the split"
+    `train, val = time_split(df)` unpacks the two DataFrames your function
+    returns into two names at once — the same pattern as the `for name,
+    thing in [...]` unpacking from Stage 01, just returning two values
+    instead of looping over a list of them. `len(train)`/`len(val)` should
+    add up to `len(df)`. `train["date"].max()` and `val["date"].min()`
+    print the boundary date on each side of the split — the first should
+    land before the second, since `train` is everything *before* `val` in
+    time.
 
 Now prove it — as its own file. It won't see what `explore.py` loaded, so it
 needs its own `df`. Create `02a_data/test_load.py`:
@@ -252,9 +290,6 @@ def test_split_is_chronological():
     did — a separate file, a separate run, nothing carries over between them.
     `def test_split_is_chronological():` takes no parameters — the empty
     `()` is legal, it just means this function needs nothing handed to it.
-    `train, val = time_split(df)` unpacks the two values `time_split`
-    returns into two names in one line, the same unpacking you saw with
-    `for name, thing in [...]` in Stage 01.
 
     Each `assert` line checks one condition and fails loudly, naming what
     broke, if that condition is false. Watch the second one specifically:
@@ -362,9 +397,14 @@ Go back to the four questions from before you opened your editor.
 predicting. Build 3's `test_split_is_chronological` is that answer, enforced
 as code rather than left as an intention.
 
-**Q2 — what a random shuffle would let the model see.** The future. Build 3's
-whole reason for existing is to make that impossible by construction, not by
-discipline you have to remember to apply every time.
+**Q2 — what a random shuffle would let the model see.** The future,
+concretely: shuffle the rows and take a random 80% for training, and some
+of those training rows land on dates *after* some of your validation
+weeks. The model gets tuned partly on what prices did in weeks that come
+later than the ones it's scored against — exactly backwards from the real
+task of predicting a week you haven't seen yet. Build 3's whole reason for
+existing is to make that impossible by construction, not by discipline you
+have to remember to apply every time.
 
 **Q3 — the missing week.** You picked one of drop, forward-fill, or
 interpolate in Build 2, and wrote down why. There is no single correct choice
