@@ -148,6 +148,16 @@ def test_dot_rejects_mismatched_lengths():
     inside it to raise a `ValueError` — the test passes only if that error
     actually happens, and fails if the code runs without error instead.
 
+??? info "🔧 What this code does — testing against many random cases"
+    `rng.integers(1, 8)` picks a random length between 1 and 7 each
+    iteration; `rng.normal(size=n)` draws `n` values from a standard normal
+    distribution, so `u` and `v` are two random vectors of that same
+    random length. Twenty iterations, twenty different random lengths and
+    values, and every single one has to match NumPy's `np.dot` — one lucky
+    pass would prove nothing, twenty different ones start to. The second
+    test checks the opposite case: `dot` must raise, not silently return
+    something, when the two vectors don't match in length.
+
 ```powershell
 cd 01_math_engine
 pytest
@@ -213,6 +223,23 @@ def test_matmul_rejects_bad_shapes():
         matmul(np.zeros((2, 3)), np.zeros((4, 5)))
 ```
 
+??? info "🐍 Python syntax — `@`, matrix multiplication"
+    `A @ B` is Python's dedicated operator for matrix multiplication —
+    introduced specifically so NumPy doesn't have to overload `*`, which
+    instead multiplies two arrays element by element. `A @ B` and `A * B`
+    both run without erroring and produce completely different, unrelated
+    results, so mixing them up is a silent-bug risk worth remembering.
+
+??? info "🔧 What this code does — same test, random shapes this time"
+    `rng.integers(1, 6, size=3)` draws three random integers at once — `m`,
+    `n`, `p` — so every one of the 20 iterations tests a different pair of
+    shapes, not just different values. `rng.normal(size=(m, n))` extends
+    Build 2's `size=n` to two dimensions: `A` is `m` rows by `n` columns,
+    `B` is `n` rows by `p` columns — shapes compatible with each other by
+    construction, matching Build 1's shape discussion. `np.allclose` is
+    `np.isclose` from Build 2, extended to compare every entry of two
+    arrays at once instead of two single numbers.
+
 Run it: `pytest`. Four tests, four passes.
 
 Then measure what it cost you. Add to `math_engine.py`:
@@ -238,6 +265,21 @@ print(f"ratio  {mine / theirs:.0f}x")
     the "start the clock, do the work, read the clock" sequence visually
     together. `{mine:.3f}` is the same formatting spec as `{name:7}` earlier,
     this time meaning "3 digits after the decimal point."
+
+??? info "🔧 What this code does — timing the two versions"
+    `A @ B` reuses the same operator from the test above — this is NumPy
+    doing the identical multiplication, timed the same way your `matmul`
+    is. `time.perf_counter()` returns a high-precision clock reading;
+    calling it before and after some work and subtracting gives you how
+    long that work took.
+
+    `.4f` and `.0f` extend the `.3f` format spec from the note above the
+    same way — 4 digits after the decimal for `theirs` (NumPy is fast
+    enough that you need the extra digit to see it isn't zero), and 0
+    digits for the ratio (a big number, rounded to the nearest whole one).
+    The `s` and `x` right after each closing `}` aren't part of the
+    formatting at all — they're literal characters typed into the string,
+    short for "seconds" and "times."
 
 Write that ratio in your log. Your loops are correct — and expect the ratio
 to be large. Two, three, even four orders of magnitude slower is normal for
@@ -274,6 +316,17 @@ plt.axis("equal"); plt.grid(True); plt.legend()
 plt.show()
 ```
 
+??? info "🔧 What this code does — plotting before and after"
+    `square` and `moved` are each a `(2, 5)` array — row 0 holds every
+    x-coordinate, row 1 holds every y-coordinate, for the five corners
+    that trace the square (the last point repeats the first, to close the
+    shape). `plt.plot(square[0], square[1], label="before")` draws one
+    line connecting those five points in order; the second `plt.plot`
+    does the same for `moved`, the result of your own `matmul`.
+    `plt.axis("equal")` forces both axes to use the same scale, so a right
+    angle actually looks like one instead of being stretched; `plt.legend()`
+    shows the `label=` text for each line so you can tell which is which.
+
 Your own `matmul` drew that.
 
 Now try three of your own: one that rotates, one that reflects, one that
@@ -281,8 +334,16 @@ squashes the square flat onto a line. Predict the picture before you run each
 one, then run it.
 
 For the flat one, compute `np.linalg.det(M)` and note what the determinant is.
-You know what a zero determinant means algebraically. Now you can see it:
-the transformation threw away a dimension, and no matrix can put it back.
+
+You know algebraically that a zero determinant means `M` has no inverse.
+Look at the picture and see what that means physically: your square
+collapsed onto a line, so many different points in the original square now
+land on the exact same point on that line. Given only where a point ended
+up, you cannot tell which of those original points it came from — the
+information about *which one* is gone. That is what "no inverse" means
+here: no matrix could undo the collapse and hand back the original square,
+because undoing it would mean deciding, for every point on the line, which
+one of infinitely many original points to send it back to.
 
 Commit your work:
 
