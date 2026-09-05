@@ -116,6 +116,11 @@ Write the body with a loop — `sum(...)` and NumPy's own `np.dot` are both off
 limits here. Multiply matching entries, add them up, return the total. Raise
 a `ValueError` if the lengths disagree.
 
+??? tip "Hint — open only when stuck"
+    Check `u.shape != v.shape` first and `raise ValueError(...)` if they
+    don't match. Then loop: `total = 0.0`, then `for i in range(len(u)):
+    total += u[i] * v[i]`. Return `total`.
+
 Now the check. Create `01_math_engine/test_math_engine.py`:
 
 ```python
