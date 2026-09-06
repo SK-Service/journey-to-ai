@@ -26,7 +26,7 @@ A normal Windows laptop is enough. No GPU required — everything in this journe
 - **[01 — Build Your Own Mini Math Engine](stage-01-mini-math-engine.md)**
 - **[02a — Get Real Data and Look at It](stage-02a-data.md)**
 - **[02b — Teach a Line to Fit Itself](stage-02b-gradient-descent.md)**
-- 02c — Point It at the Real World *(coming)*
+- **[02c — Point It at the Real World](stage-02c-gas-price-ml.md)**
 
 ### Learning Machines
 
